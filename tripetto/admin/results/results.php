@@ -360,7 +360,9 @@ class Results
             Tripetto::assert("delete-results");
 
             if (is_array($ids)) {
-                $ids = implode(",", $ids);
+                $ids = implode(",", array_map("intval", $ids));
+            } else {
+                $ids = intval($ids);
             }
 
             $attachments = $wpdb->get_col("SELECT id FROM {$wpdb->prefix}tripetto_attachments WHERE entry_id IN ($ids)");

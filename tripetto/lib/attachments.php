@@ -59,52 +59,56 @@ class Attachments
             if (!is_null($form) && (empty($nonce) || wp_verify_nonce($nonce, Runner::runnerNonce($form->id)))) {
                 $filename = sanitize_file_name($file["name"]);
 
-                add_filter("upload_dir", ["Tripetto\Attachments", "setUploadDir"]);
+                $validate = wp_check_filetype($filename);
 
-                $uploadDir = wp_upload_dir();
+                if ($validate["type"] != false && $validate["type"] != "text/html") {
+                    add_filter("upload_dir", ["Tripetto\Attachments", "setUploadDir"]);
 
-                $wpdb->insert($wpdb->prefix . "tripetto_attachments", [
-                    "form_id" => $form->id,
-                    "entry_id" => 0,
-                    "reference" => "",
-                    "name" => $filename,
-                    "path" => $uploadDir["path"],
-                    "type" => sanitize_mime_type($file["type"]),
-                    "created" => date("Y-m-d H:i:s"),
-                ]);
+                    $uploadDir = wp_upload_dir();
 
-                $attachmentId = intval($wpdb->insert_id);
-
-                if (!empty($attachmentId)) {
-                    $reference = hash("sha256", $form->fingerprint . wp_create_nonce("tripetto:attachments:upload:" . $attachmentId));
-
-                    // Change the filename.
-                    $file["name"] = $reference;
-
-                    // Save the file to disk.
-                    $uploaded_file = wp_handle_upload($file, [
-                        "test_form" => false,
-                        "test_type" => false,
-                        "action" => "upload_attachment",
+                    $wpdb->insert($wpdb->prefix . "tripetto_attachments", [
+                        "form_id" => $form->id,
+                        "entry_id" => 0,
+                        "reference" => "",
+                        "name" => $filename,
+                        "path" => $uploadDir["path"],
+                        "type" => sanitize_mime_type($file["type"]),
+                        "created" => date("Y-m-d H:i:s"),
                     ]);
 
-                    if ($uploaded_file && empty($uploaded_file["error"])) {
-                        $wpdb->update($wpdb->prefix . "tripetto_attachments", ["reference" => $reference], ["id" => $attachmentId]);
+                    $attachmentId = intval($wpdb->insert_id);
 
-                        header("Content-Type: application/json");
+                    if (!empty($attachmentId)) {
+                        $reference = hash("sha256", $form->fingerprint . wp_create_nonce("tripetto:attachments:upload:" . $attachmentId));
 
-                        $response = Helpers::createJSON();
-                        $response->reference = $reference;
+                        // Change the filename.
+                        $file["name"] = $reference;
 
-                        http_response_code(200);
-
-                        echo Helpers::JSONToString($response);
-
-                        return die();
-                    } else {
-                        $wpdb->delete($wpdb->prefix . "tripetto_attachments", [
-                            "id" => $attachmentId,
+                        // Save the file to disk.
+                        $uploaded_file = wp_handle_upload($file, [
+                            "test_form" => false,
+                            "test_type" => false,
+                            "action" => "upload_attachment",
                         ]);
+
+                        if ($uploaded_file && empty($uploaded_file["error"])) {
+                            $wpdb->update($wpdb->prefix . "tripetto_attachments", ["reference" => $reference], ["id" => $attachmentId]);
+
+                            header("Content-Type: application/json");
+
+                            $response = Helpers::createJSON();
+                            $response->reference = $reference;
+
+                            http_response_code(200);
+
+                            echo Helpers::JSONToString($response);
+
+                            return die();
+                        } else {
+                            $wpdb->delete($wpdb->prefix . "tripetto_attachments", [
+                                "id" => $attachmentId,
+                            ]);
+                        }
                     }
                 }
             }

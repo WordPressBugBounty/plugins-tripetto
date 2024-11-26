@@ -4,7 +4,7 @@ Tags: form builder, form plugin, form, forms, contact form
 Requires at least: 4.9
 Tested up to: 6.7
 Requires PHP: 5.6
-Stable tag: 8.0.5
+Stable tag: 8.0.7
 License: GPLv2 or later
 
 Advanced WordPress form builder plugin to build conversational contact forms, surveys, quizzes and more. Give life to forms and surveys.
@@ -383,6 +383,9 @@ The following translations are included:
 ⚡ Improvement
 🐛 Bugfix
 ❌ Deprecated or removed feature
+
+**VERSION 8.0.7 (26-11-2024)**
+🐛 Fixed a security issue in the upload block
 
 **VERSION 8.0.5 (05-11-2024)**
 ⚡ Tested compatibility with WordPress 6.7

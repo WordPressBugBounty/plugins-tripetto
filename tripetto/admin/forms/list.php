@@ -287,8 +287,7 @@ class FormsList extends ListFactory
         $nonce = !empty($_REQUEST["nonce"]) ? $_REQUEST["nonce"] : "";
 
         if (is_array($ids)) {
-            $ids = array_map("intval", $ids);
-            $ids = implode(",", $ids);
+            $ids = implode(",", array_map("intval", $ids));
         } else {
             $ids = intval($ids);
         }
