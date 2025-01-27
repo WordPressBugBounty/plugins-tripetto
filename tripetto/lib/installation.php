@@ -180,6 +180,11 @@ class Installation
         return "usd";
     }
 
+    static function show_annual_pricing()
+    {
+        return false;
+    }
+
     static function register($plugin)
     {
         add_action("wp_loaded", ["Tripetto\Installation", "loaded"]);
@@ -187,6 +192,7 @@ class Installation
 
         tripetto_fs()->add_action("after_uninstall", ["Tripetto\Installation", "uninstall"]);
         tripetto_fs()->add_filter("default_currency", ["Tripetto\Installation", "currency"]);
+        tripetto_fs()->add_filter("pricing/show_annual_in_monthly", ["Tripetto\Installation", "show_annual_pricing"]);
 
         if (is_admin()) {
             register_activation_hook($plugin, ["Tripetto\Installation", "activate"]);

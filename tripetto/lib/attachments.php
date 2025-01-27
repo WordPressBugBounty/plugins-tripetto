@@ -82,7 +82,7 @@ class Attachments
                         $reference = hash("sha256", $form->fingerprint . wp_create_nonce("tripetto:attachments:upload:" . $attachmentId));
 
                         // Change the filename.
-                        $file["name"] = $reference;
+                        $file["name"] = hash("sha256", $reference . $attachmentId);
 
                         // Save the file to disk.
                         $uploaded_file = wp_handle_upload($file, [
@@ -140,7 +140,16 @@ class Attachments
                 !is_null($attachment) &&
                 !empty($attachment->id)
             ) {
-                $path = $attachment->path . "/" . $attachment->reference;
+                $path = $attachment->path . "/" . hash("sha256", $attachment->reference . $attachment->id);
+
+                // Some hosts tend to save files without an extension as a file without a name and the extension as name.
+                if (!file_exists($path)) {
+                    $path = $attachment->path . "/." . hash("sha256", $attachment->reference . $attachment->id);
+                }
+
+                if (!file_exists($path)) {
+                    $path = $attachment->path . "/" . $attachment->reference;
+                }
 
                 // Some hosts tend to save files without an extension as a file without a name and the extension as name.
                 if (!file_exists($path)) {
@@ -223,7 +232,13 @@ class Attachments
                 "id" => $id,
             ]);
 
-            wp_delete_file($attachment->path . "/" . $attachment->reference);
+            $path = $attachment->path . "/" . hash("sha256", $attachment->reference . $attachment->id);
+
+            if (file_exists($path)) {
+                wp_delete_file($path);
+            } else {
+                wp_delete_file($attachment->path . "/" . $attachment->reference);
+            }
         }
     }
 
@@ -354,7 +369,16 @@ class Attachments
                         }
 
                         if (($secured && Tripetto::assert("view-results")) || (!$secured && is_admin())) {
-                            $path = $attachment->path . "/" . $attachment->reference;
+                            $path = $attachment->path . "/" . hash("sha256", $attachment->reference . $attachment->id);
+
+                            // Some hosts tend to save files without an extension as a file without a name and the extension as name.
+                            if (!file_exists($path)) {
+                                $path = $attachment->path . "/." . hash("sha256", $attachment->reference . $attachment->id);
+                            }
+
+                            if (!file_exists($path)) {
+                                $path = $attachment->path . "/" . $attachment->reference;
+                            }
 
                             // Some hosts tend to save files without an extension as a file without a name (and the extension as name).
                             if (!file_exists($path)) {

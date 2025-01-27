@@ -8,7 +8,7 @@
  * Author URI: https://tripetto.com
  * Text Domain: tripetto
  * Domain path: /languages
- * Version: 8.0.7
+ * Version: 8.0.8
  * Requires at least: 4.9
  * Requires PHP: 5.6
  * License: GPLv2 or later
@@ -78,7 +78,7 @@ if ( function_exists( 'Tripetto\\tripetto_fs' ) ) {
         // Signal that SDK was initiated.
         do_action( "tripetto_fs_loaded" );
     }
-    $GLOBALS["TRIPETTO_PLUGIN_VERSION"] = "8.0.7";
+    $GLOBALS["TRIPETTO_PLUGIN_VERSION"] = "8.0.8";
     // Libraries and helpers
     require_once __DIR__ . "/lib/polyfill.php";
     require_once __DIR__ . "/lib/attachments.php";
