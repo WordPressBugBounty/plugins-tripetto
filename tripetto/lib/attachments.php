@@ -94,6 +94,13 @@ class Attachments
                         if ($uploaded_file && empty($uploaded_file["error"])) {
                             $wpdb->update($wpdb->prefix . "tripetto_attachments", ["reference" => $reference], ["id" => $attachmentId]);
 
+                            // Create an index file to prevent directory listing.
+                            $index_file = $uploadDir["path"] . "/index.html";
+
+                            if (!file_exists($index_file)) {
+                                file_put_contents($index_file, "");
+                            }
+
                             header("Content-Type: application/json");
 
                             $response = Helpers::createJSON();
