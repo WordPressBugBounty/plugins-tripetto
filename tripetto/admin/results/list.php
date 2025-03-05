@@ -73,7 +73,7 @@ class ResultsList extends ListFactory
 
         if (Capabilities::deleteResults()) {
             $actions["delete"] = sprintf(
-                '<a href="javascript:;" onclick="WPTripetto.showModal(\'%s\',\'%s\',\'%s\',\'%s\',\'?page=%s&action=results&id=%s&result_id=%s\',440,270);">%s</a>',
+                '<a href="javascript:;" onclick="WPTripetto.showModal(\'%s\',\'%s\',\'%s\',\'%s\',\'?page=%s&action=results&id=%s&result_id=%s&nonce=%s\',440,270);">%s</a>',
                 __("Are you sure?", "tripetto"),
                 __(
                     "Do you really want to delete this result? All data related to this result will be deleted. This cannot be undone.",
@@ -84,6 +84,7 @@ class ResultsList extends ListFactory
                 esc_attr($_REQUEST["page"]),
                 esc_attr($_REQUEST["id"]),
                 $item["id"],
+                wp_create_nonce("tripetto:delete:result"),
                 "❌ " . __("Delete", "tripetto")
             );
         }
@@ -170,7 +171,9 @@ class ResultsList extends ListFactory
      */
     function process_bulk_action()
     {
-        if ("results" === $this->current_action()) {
+        $nonce = !empty($_REQUEST["nonce"]) ? $_REQUEST["nonce"] : "";
+
+        if ("results" === $this->current_action() && wp_verify_nonce($nonce, "tripetto:delete:result")) {
             $ids = !empty($_REQUEST["result_id"]) ? $_REQUEST["result_id"] : [];
 
             if (is_array($ids)) {

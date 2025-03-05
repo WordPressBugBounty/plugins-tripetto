@@ -121,6 +121,7 @@ class Results
                 echo '<form id="tripetto_results_table" method="GET">';
                 echo '<input type="hidden" name="page" value="' . esc_attr($_REQUEST["page"]) . '" />';
                 echo '<input type="hidden" name="id" value="' . esc_attr($_REQUEST["id"]) . '" />';
+                echo '<input type="hidden" name="nonce" value="' . esc_attr(wp_create_nonce("tripetto:delete:result")) . '" />';
 
                 $results->display();
 
@@ -338,6 +339,8 @@ class Results
                                 $result->form_id .
                                 "&result_id=" .
                                 $id .
+                                "&nonce=" .
+                                wp_create_nonce("tripetto:delete:result") .
                                 '\',440,270);">' .
                                 __("Delete Result", "tripetto") .
                                 "</a>"
